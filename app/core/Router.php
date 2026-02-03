@@ -23,29 +23,38 @@ class Router
 
 foreach ($this->routes as $route) {
 
+    $pattern = str_replace(
+    '{id}',
+    '([0-9]+)', 
+    $route['uri']
+    );
+    $pattern = '#^' . $pattern . '$#';
+
+    if (preg_match($pattern, $uri, $matches)) {
+        array_shift($matches); 
+
+        if ($method !== $route['method']) {
+            continue;
+        }
+require_once './app/controllers/' . $route['controller'] . '.php';
+$controllerClass = 'App\\Controllers\\' . $route['controller'];
+$controller = new $controllerClass();
+$function = $route['function'];
+
+call_user_func_array([$controller, $function], $matches);
+// index ($parameters1, $parameters2, dst)
+return;
 
 
-
-}
-
+    }
+{
       
-        if ($method =='GET' && $uri == '/Students'){
-            require_once'./app/controllers/Students Controller.php';
-           $controller = new StudentsController();
-              $controller->index();
-            echo'<h1>daftar siswa</h1>';
-            echo'<p>menampilkan daftar siswa</p>';
-        return;
-        }
-         if ($method =='GET' && $uri == '/Students/create') {
-           require_once'./app/controllers/Students Controller.php';
-           $controller = new StudentsController();
-              $controller->create();
-        return;
-        }
+    
 
         http_response_code(404);
         echo'<h1>404 Not Found</h1>';
         
+    }
+        }
     }
 }
